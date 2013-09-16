@@ -5,7 +5,7 @@
  * the functions d() and dd() where inspired Kint
  * 
  * @author      Yosko <contact@yosko.net>
- * @version     0.2
+ * @version     0.3
  * @copyright   none: free and opensource
  * @link        http://www.yosko.net/
  */
@@ -57,16 +57,24 @@ class EasyDump {
             echo "}\r\n";
         } else {
             echo '<span style="color:#95CC5E;">';
-            if(is_object($value)) {
+            if(is_object($value) || is_resource($value)) {
+                ob_start();
                 var_dump($value);
+                $result = ob_get_clean();
+                //trim the var_dump because EasyDump already handle the newline after dump
+                echo trim($result);
             } elseif(is_array($value)) {
                 echo serialize($value);
             } elseif(is_string($value)) {
                 echo '"'.htmlentities($value).'"';
             } elseif(is_bool($value)) {
                 echo $value?'true':'false';
-            } else {
+            } elseif(is_null($value)) {
+                echo 'NULL';
+            } elseif(is_numeric($value)) {
                 echo $value;
+            } else {
+                echo 'N/A';
             }
             echo "</span>\r\n";
         }
