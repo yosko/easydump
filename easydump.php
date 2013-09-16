@@ -5,17 +5,27 @@
  * the functions d() and dd() where inspired Kint
  * 
  * @author      Yosko <contact@yosko.net>
- * @version     0.3
+ * @version     0.4
  * @copyright   none: free and opensource
- * @link        http://www.yosko.net/
+ * @link        https://github.com/yosko/easydump
  */
 class EasyDump {
+    //color theme (default based on Earthsong by daylerees)
+    public static $color = array(
+        'text'          => '#EBD1B7',
+        'border'        => '#7A7267',
+        'background'    => '#36312c',
+        'name'          => '#F8BB39',
+        'type'          => '#DB784D',
+        'value'         => '#95CC5E'
+    );
+
     /**
      * For debug purpose only
      * @param  misc    $variables any number of variables of any type
      */
     public static function debug() {
-        echo '<pre style="border: 0.5em solid #7A7267; color: #EBD1B7; background-color: #36312c; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
+        echo '<pre style="border: 0.5em solid '.self::$color['border'].'; color: '.self::$color['text'].'; background-color: '.self::$color['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
         $trace = debug_backtrace();
 
         foreach ( $trace[0]['args'] as $k => $v ) {
@@ -44,8 +54,8 @@ class EasyDump {
     protected static function showVar($name, $value, $level = 0, $dumpArray = false) {
         $indent = "    ";
         for($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
-        echo '<span style="color:#F8BB39;">'.(is_string($name)?'"'.$name.'"':'['.$name.']').'</span>';
-        echo '<span style="color:#DB784D;">('.gettype($value).")</span>\t= ";
+        echo '<span style="color:'.self::$color['name'].';">'.(is_string($name)?'"'.$name.'"':'['.$name.']').'</span>';
+        echo '<span style="color:'.self::$color['type'].';">('.gettype($value).")</span>\t= ";
         if(is_array($value) && !$dumpArray && $level <= 5) {
             echo '{';
             if(!empty($value)) {
@@ -56,7 +66,7 @@ class EasyDump {
             }
             echo "}\r\n";
         } else {
-            echo '<span style="color:#95CC5E;">';
+            echo '<span style="color:'.self::$color['value'].';">';
             if(is_object($value) || is_resource($value)) {
                 ob_start();
                 var_dump($value);
