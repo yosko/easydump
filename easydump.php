@@ -5,7 +5,7 @@
  * the functions d() and dd() where inspired Kint
  * 
  * @author      Yosko <contact@yosko.net>
- * @version     0.1
+ * @version     0.2
  * @copyright   none: free and opensource
  * @link        http://www.yosko.net/
  */
@@ -63,6 +63,8 @@ class EasyDump {
                 echo serialize($value);
             } elseif(is_string($value)) {
                 echo '"'.htmlentities($value).'"';
+            } elseif(is_bool($value)) {
+                echo $value?'true':'false';
             } else {
                 echo $value;
             }
