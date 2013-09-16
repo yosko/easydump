@@ -28,7 +28,9 @@ d($var);
 de($var);
 ```
 
-See ```index.php``` for examples.
+See ```index.php``` for examples. The result would look like this:
+
+![Screenshot of EasyDump](http://www.yosko.net/data/images/easydump.png)
 
 ### Change color theme
 
