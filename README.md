@@ -17,8 +17,8 @@ Then call the EasyDump functions:
 
 ```php
 $var = 'test';
-EasyDump::debug($var);
-EasyDump::debugExit($var);
+EasyDump::debug($var);     //just dump
+EasyDump::debugExit($var); //exit code right after the dump
 ```
 
 Or you can use the shortcut alias:
@@ -30,15 +30,18 @@ de($var);
 
 See ```index.php``` for examples. The result would look like this:
 
-![Screenshot of EasyDump](http://www.yosko.net/data/images/easydump.png)
+![Screenshot of EasyDump](http://www.yosko.net/data/images/easydump.png) 
 
-### Change color theme
+## Settings
 
-Juste change the values of the array called **$color** in ```easydump.php```.
+Just change the values of the array called **$config** at the top of ```easydump.php``` :
+- ```showVarNames```: show the variable names the way they were given during the EasyDump call (depends on SplFileObject, needs PHP 5.1.0+)
+- ```showCall```: show the PHP code of the call to EasyDump (useful when doing a lot of dumps) (depends on SplFileObject, needs PHP 5.1.0+)
+- ```color```: the HEX color theme for display
 
 ## Licence
 
-EasyDump is in the public domain. This means you can do whatever you want with it without any restriction. If you need a public license, consider it as distributed under the [WTFPL](http://www.wtfpl.net/txt/copying/).
+EasyDump was thought and written to be in the public domain. This means you can do whatever you want with it without any restriction. If you need a public license, consider it as distributed under the [WTFPL](http://www.wtfpl.net/txt/copying/).
 
 The only exception to this rule is the default color theme: it is called Earthsong and was originally created by [daylerees](https://github.com/daylerees/colour-schemes/#earthsong) and distributed under the MIT License.
 

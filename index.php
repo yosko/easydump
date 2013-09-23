@@ -5,19 +5,28 @@ require_once( 'easydump.php');
 $var1 = "toto";
 $var2 = opendir('.');
 $var3 = array(
-    'titi' => 'tonton',
-    'tata' => 'toutou',
+    'titi' => 'tete',
+    'tata' => 'tutu',
 );
-$var4 = new DateTime();
 
 
-EasyDump::debug(756, $var1, null, $var2, $var3, $var4);
-// or simply:
-//d(756, $var1, null, $var2, $var3, $var4);
+// basic example
+EasyDump::debug($var1);
+// or more simply:
+// d($var1);
  
-//immediatly stop the script after the dump:
-EasyDump::debugExit(756, $var1, null, $var2, $var3, $var4);
-// or simply:
-//de(756, $var1, null, $var2, $var3, $var4);
+// extended example:
+// - immediatly stop the script after the dump
+// - dump any number of variables, values and function/class calls
+EasyDump::debugExit(
+    756,
+    $var1,
+    null,
+    $var2,
+    $var3,
+    new DateTime()
+);
+// or more simply:
+// de(756, $var1, null, $var2, $var3, new DateTime());
 
 ?>
