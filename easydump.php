@@ -13,7 +13,7 @@ class EasyDump {
     //display configurattion
     public static $config = array(
         'showVarNames'  => true,    //true to show names of the given variables
-        'showCall'      => true,    //true to show the code of the PHP call to EasyDump
+        'showSource'    => true,    //true to show the code of the PHP call to EasyDump
         'color'         => array(   //default theme based on Earthsong by daylerees
             'text'          => '#EBD1B7',
             'border'        => '#7A7267',
@@ -29,22 +29,27 @@ class EasyDump {
      * @param  misc    $variables any number of variables of any type
      */
     public static function debug() {
-        echo '<pre style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
         $trace = debug_backtrace();
+        $call = self::readCall($trace);
 
-        if(self::$config['showVarNames'] || self::$config['showCall']) {
-            $call = self::readCall($trace);
+        echo '<pre style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
+        
+        //show file and line
+        self::showCall($call);
 
-            if(self::$config['showVarNames'])
-                $varNames = self::guessVarName($trace, $call);
+        //show PHP source of the call
+        if(self::$config['showSource'])
+            self::showSource($call);
 
-            if(self::$config['showCall'])
-                self::showCall($call);
-        }
+        //get the variable names (if available)
+        if(self::$config['showVarNames'])
+            $varNames = self::guessVarName($trace, $call);
 
+        //show the values (with variable names if available)
         foreach ( $trace[0]['args'] as $k => $v ) {
             EasyDump::showVar((self::$config['showVarNames']?$varNames[$k]:$k), $v);
         }
+
         echo '</pre>';
     }
 
@@ -106,13 +111,20 @@ class EasyDump {
     }
 
     /**
+     * Display the filename and line number where EasyDump was called
+     * @param  array $call informations about the call
+     */
+    protected static function showCall($call) {
+        echo "<span style=\"color:".self::$config['color']['type'].";\">File \"".$call['file']."\" line ".$call['line'].":</span>\r\n";
+    }
+
+    /**
      * Display the PHP code where EasyDump was called
      * useful for tracking lots of different calls with values/functions as parameters
      * @param  array $call informations about the call
      */
-    protected static function showCall($call) {
-        echo "<span style=\"color:".self::$config['color']['type'].";\">File \"".$call['file']."\" line ".$call['line'].":</span>\r\n"
-        .$call['formatedCode']
+    protected static function showSource($call) {
+        echo $call['formatedCode']
         ."\r\n"
         ."<span style=\"color:".self::$config['color']['type'].";\">Results:</span>"
         ."\r\n";

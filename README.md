@@ -3,6 +3,10 @@ EasyDump
 
 EasyDump is an easy, sexy and lightweight way to display your PHP variable when developing. It is a nice alternative to ```var_dump```. It was partly inspired by (but not based on) [Kint](http://www.webresourcesdepot.com/kint-a-debugging-helper-for-php-apps/), but is way more simple.
 
+## Requirement
+
+EasuDump depends on SplFileObject, which needs PHP 5.1.0 or higher.
+
 ## Use
 
 ### Dump variables
@@ -35,8 +39,8 @@ See ```index.php``` for examples. The result would look like this:
 ## Settings
 
 Just change the values of the array called **$config** at the top of ```easydump.php``` :
-- ```showVarNames```: show the variable names the way they were given during the EasyDump call (depends on SplFileObject, needs PHP 5.1.0+)
-- ```showCall```: show the PHP code of the call to EasyDump (useful when doing a lot of dumps) (depends on SplFileObject, needs PHP 5.1.0+)
+- ```showVarNames```: show the variable names the way they were given during the EasyDump call
+- ```showSource```: show the PHP code of the call to EasyDump (useful when doing a lot of dumps)
 - ```color```: the HEX color theme for display
 
 ## Licence
