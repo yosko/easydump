@@ -30,7 +30,7 @@ de($var);
 
 See ```index.php``` for examples. The result would look like this:
 
-![Screenshot of EasyDump](http://www.yosko.net/data/images/easydump.png) 
+![Screenshot of EasyDump](https://raw.github.com/yosko/easydump/master/screenshot.png) 
 
 ## Settings
 

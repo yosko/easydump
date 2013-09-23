@@ -60,7 +60,6 @@ class EasyDump {
     /**
      * For debug purpose only, used by debug()
      * Recursive (for arrays) function to display variable in a nice formated way
-     * This function uses SplFileObject, only available on PHP 5.1.0+
      * 
      * @param  string  $name           name/value of the variable's index
      * @param  misc    $value          value to display
@@ -112,7 +111,7 @@ class EasyDump {
      * @param  array $call informations about the call
      */
     protected static function showCall($call) {
-        echo "<span style=\"color:".self::$config['color']['type'].";\">Original call:</span>\r\n"
+        echo "<span style=\"color:".self::$config['color']['type'].";\">File \"".$call['file']."\" line ".$call['line'].":</span>\r\n"
         .$call['formatedCode']
         ."\r\n"
         ."<span style=\"color:".self::$config['color']['type'].";\">Results:</span>"
@@ -166,6 +165,8 @@ class EasyDump {
 
     /**
      * Read informations from the backtrace and the PHP file about the call to EasyDump
+     * This function uses SplFileObject, only available on PHP 5.1.0+
+     * 
      * @param  array $trace backtrace executed PHP code
      * @return array        informations about the call
      */
@@ -208,7 +209,8 @@ class EasyDump {
             'code' => $call,
             'formatedCode' => $callMultiline,
             'rank' => $rank,
-            'file' => $file,
+            'line' => $line + 1,
+            'file' => $trace[$rank]['file']
         );
     }
 }
