@@ -139,21 +139,8 @@ class EasyDump {
      */
     protected static function guessVarName($trace, $call) {
         $varNames = array();
-
-        //remove litteral content that we don't need to proccess and might contain commas
-        //three steps: 
-        // 1- remove recursively the content of for (), [] and {}
-        // 2- removes escaped ' and "
-        // 3- removes content betweend '' and "" (no recursion needed)
-        $embracerPattern = "/\[([^\[\]]++|(?R))*+\]|\(([^\(\)]++|(?R))*+\)|{([^{}]++|(?R))*+}/";
-        $escapedQuotePattern = "/\\\\'|\\\\\"/";
-        $quotedStringPattern = "/'([^']++)*+'|\"([^\"]++)*+\"/";
-        $call['code'] = preg_replace($embracerPattern, '', $call['code']);
-        $call['code'] = preg_replace($escapedQuotePattern, '', $call['code']);
-        $call['code'] = preg_replace($quotedStringPattern, "''", $call['code']);
-
-        //get the list of given parameters
-        $results = preg_split('/,/', $call['code']);
+        
+        $results = self::parse($call['code']);
 
         foreach($results as $k => $v) {
             $processString = trim($v);
@@ -167,13 +154,78 @@ class EasyDump {
                 //TODO: not working for empty string
                 $varNames[] = '[value]';
             } elseif(preg_match('([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)', $processString, $matches)) {
-                $varNames[] = $processString.'()';
+                $varNames[] = $processString;
             } else {
                 $varNames[] = '[unknown]';
             }
         }
 
         return $varNames;
+    }
+
+    /**
+     * Pars PHP code to extract comma separated elements into an array
+     * @param  string $code PHP code
+     * @return array        list of elements
+     */
+    protected static function parse($code) {
+        $names = array();
+        $currentName = '';
+
+        $depth = 0;
+        $escapeNext = false;
+        $delimiter = array(
+            '(' => ')',
+            '[' => ']',
+            '{' => '}',
+        );
+        $inQuotes = '';
+        $inDelimiter = '';
+        for($i = 0; $i < strlen($code); $i++) {
+            $stackChar = true;
+            if(!$escapeNext) {
+                //escape char inside a string between single/double quotes
+                if(!empty($inQuotes) && $code[$i] == '\\') {
+                    $escapeNext = true;
+                //leaving a quoted string
+                } elseif(!empty($inQuotes) && $code[$i] == $inQuotes) {
+                    $inQuotes = '';
+                //entering a quoted string
+                } elseif(empty($inQuotes) && ($code[$i] == '\'' || $code[$i] == '"')) {
+                    $inQuotes = $code[$i];
+                //recursive use of delimiter, add a level
+                } elseif(!empty($inDelimiter) && $code[$i] == $inDelimiter) {
+                    $depth++;
+                //recursive use of delimiter, remove a level
+                } elseif(!empty($inDelimiter) && $code[$i] == $delimiter[$inDelimiter]) {
+                    $depth--;
+                    //leaving the parent delimiter
+                    if($depth == 0) {
+                        $inDelimiter = '';
+                    }
+                //entering a parent delimiter
+                } elseif(empty($inDelimiter) && array_key_exists($code[$i], $delimiter)) {
+                    $inDelimiter = $code[$i];
+                    $depth++;
+                //a root, breaking comma
+                } elseif(empty($inDelimiter) && empty($inQuotes) && $code[$i] == ',') {
+                    $names[] = $currentName;
+                    $currentName = '';
+                    $stackChar = false;
+                }
+            } else {
+                $escapeNext = false;
+            }
+
+            //add the char to the currently processed name
+            if($stackChar) {
+                $currentName .= $code[$i];
+            }
+        }
+
+        //add the last name to the array
+        $names[] = $currentName;
+        return $names;
     }
 
     /**

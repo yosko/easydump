@@ -5,7 +5,7 @@ require_once( 'easydump.php');
 $var1 = "toto";
 $var2 = opendir('.');
 $var3 = array(
-    'titi' => 'tete',
+    'ti,ti' => 'tete',
     'tata' => 'tutu',
 );
 
@@ -23,10 +23,10 @@ EasyDump::debugExit(
     $var1,
     null,
     $var2,
-    $var3,
+    $var3['ti,ti'],
     new DateTime()
 );
 // or more simply:
-// de(756, $var1, null, $var2, $var3, new DateTime());
+// de(756, $var1, null, $var2, $var3['ti,ti'], new DateTime());
 
 ?>
