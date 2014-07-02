@@ -75,8 +75,8 @@ class EasyDump {
         $indent = "    ";
         for($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
         echo '<span style="color:'.self::$config['color']['name'].';">'.($level == 0?$name:(is_string($name)?'"'.$name.'"':'['.$name.']'))." </span>";
-        echo '<span style="color:'.self::$config['color']['type'].';">('.gettype($value).")</span>\t= ";
-        if(is_array($value) && !$dumpArray && $level <= 5) {
+        echo '<span style="color:'.self::$config['color']['type'].';">('.(is_object($value)?get_class($value):gettype($value)).")</span>\t= ";
+        if(self::isTraversable($value) && !$dumpArray && $level <= 5) {
             echo '{';
             if(!empty($value)) {
                 echo "\r\n";
@@ -277,6 +277,38 @@ class EasyDump {
             'line' => $line + 1,
             'file' => $trace[$rank]['file']
         );
+    }
+
+    /**
+     * Check if given variable is traversable in any way (array, traversable object even if it doesn't
+     * implements Traversable)
+     * @param  misc    $variable backtrace executed PHP code
+     * @return boolean           informations about the call
+     */
+    protected static function isTraversable($variable) {
+        //most common cases
+        if(is_array($variable) || $variable instanceof StdClass || $variable instanceof Traversable) {
+            return true;
+        } elseif(!is_object($variable)) {
+            return false;
+        }
+
+        set_error_handler(function ($errno, $errstr, $errfile, $errline, array $errcontext) {
+            throw new Exception($errstr, $errno);
+        });
+
+
+        //try to loop through object
+        try {
+            foreach ($variable as $k => $v) {
+                break;
+            }
+        } catch (Exception $e) {
+            restore_error_handler();
+            return false;
+        }
+        restore_error_handler();
+        return true;
     }
 }
 
