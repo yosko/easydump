@@ -5,7 +5,7 @@
  * the functions d() and dd() where inspired Kint
  * 
  * @author      Yosko <contact@yosko.net>
- * @version     0.5
+ * @version     0.6
  * @copyright   none: free and opensource
  * @link        https://github.com/yosko/easydump
  */
