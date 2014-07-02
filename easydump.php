@@ -262,13 +262,15 @@ class EasyDump {
         $callMultiline = $file->current();
 
         //read the PHP file backward to the begining of the call
-        $regex = '/'.$trace[$rank]['function'].'\((.*)\);$/';
+        $regex = '/'.$trace[$rank]['function'].'\((.*)\);/';
         while( !preg_match($regex, $call, $match) ) {
             $file->seek( --$line );
             $call = trim( $file->current() ) . $call;
             $callMultiline = $file->current() . $callMultiline;
         }
         $call = $match[1];
+
+        $callMultiline = htmlentities($callMultiline);
 
         return array(
             'code' => $call,
