@@ -32,7 +32,7 @@ class EasyDump {
         $trace = debug_backtrace();
         $call = self::readCall($trace);
 
-        echo '<pre style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
+        echo '<pre class="easydump" style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
         
         //show file and line
         self::showCall($call);
