@@ -39,6 +39,8 @@ See ```index.php``` for examples. The result would look like this:
 ## Settings
 
 Just change the values of the array called **$config** at the top of ```easydump.php``` :
+- ```showCall```: show (or hide) the file name and line number of the current easydump call
+- ```showTime```: show the execution date and time (including microseconds)
 - ```showVarNames```: show the variable names the way they were given during the EasyDump call
 - ```showSource```: show the PHP code of the call to EasyDump (useful when doing a lot of dumps)
 - ```color```: the HEX color theme for display
