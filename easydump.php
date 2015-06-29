@@ -12,6 +12,7 @@
 class EasyDump {
     //display configurattion
     public static $config = array(
+        'showTime'      => true,
         'showVarNames'  => true,    //true to show names of the given variables
         'showSource'    => true,    //true to show the code of the PHP call to EasyDump
         'color'         => array(   //default theme based on Earthsong by daylerees
@@ -36,6 +37,10 @@ class EasyDump {
         
         //show file and line
         self::showCall($call);
+
+        //show file and line
+        if(self::$config['showTime'])
+            echo self::microDateTime()."\r\n";
 
         //show PHP source of the call
         if(self::$config['showSource'])
@@ -311,6 +316,11 @@ class EasyDump {
         }
         restore_error_handler();
         return true;
+    }
+
+    protected static function microDateTime() {
+      list($microSec, $timeStamp) = explode(' ', microtime());
+      return date('Y-m-d H:i:s.', $timeStamp) . (int)($microSec * 1000000);
     }
 }
 
