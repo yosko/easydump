@@ -13,9 +13,9 @@ class EasyDump {
     //display configurattion
     public static $config = array(
         'showCall'      => true,    //true to show file name and line number of each call to EasyDump
-        'showTime'      => false,   //true to show the execution date, time and microsecond of each call
+        'showTime'      => true,    //true to show the execution date, time and microsecond of each call
         'showVarNames'  => true,    //true to show names of the given variables
-        'showSource'    => false,   //true to show the code of each PHP call to EasyDump
+        'showSource'    => true,    //true to show the code of each PHP call to EasyDump
         'color'         => array(   //default theme based on Earthsong by daylerees
             'text'          => '#EBD1B7',
             'border'        => '#7A7267',
