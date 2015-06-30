@@ -13,9 +13,9 @@ class EasyDump {
     //display configurattion
     public static $config = array(
         'showCall'      => true,    //true to show file name and line number of each call to EasyDump
-        'showTime'      => true,    //true to show the execution date, time and microsecond of each call
+        'showTime'      => false,   //true to show the execution date, time and microsecond of each call
         'showVarNames'  => true,    //true to show names of the given variables
-        'showSource'    => true,    //true to show the code of each PHP call to EasyDump
+        'showSource'    => false,   //true to show the code of each PHP call to EasyDump
         'color'         => array(   //default theme based on Earthsong by daylerees
             'text'          => '#EBD1B7',
             'border'        => '#7A7267',
@@ -86,13 +86,17 @@ class EasyDump {
         echo '<span style="color:'.self::$config['color']['type'].';">('.(is_object($value)?get_class($value):gettype($value)).")</span>\t= ";
         if(self::isTraversable($value) && !$dumpArray && $level <= 5) {
             echo '{';
-            if(!empty($value)) {
+            $count = 0;
+            foreach($value as $k => $v) {
+                $count++;
+            }
+            if($count > 0) {
                 echo "\r\n";
                 foreach($value as $k => $v) {
                     self::showVar($k, $v, $level+1);
                 }
+                for($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
             }
-            for($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
             echo "}\r\n";
         } else {
             echo '<span style="color:'.self::$config['color']['value'].';">';
