@@ -3,18 +3,19 @@
 /**
  * Utility class to easily and beautifully dump PHP variables
  * the functions d() and dd() where inspired Kint
- * 
+ *
  * @author      Yosko <contact@yosko.net>
- * @version     0.7
+ * @version     0.8
  * @copyright   none: free and opensource
  * @link        https://github.com/yosko/easydump
  */
 class EasyDump {
     //display configurattion
     public static $config = array(
-        'showTime'      => true,
+        'showCall'      => true,    //true to show file name and line number of each call to EasyDump
+        'showTime'      => true,    //true to show the execution date, time and microsecond of each call
         'showVarNames'  => true,    //true to show names of the given variables
-        'showSource'    => true,    //true to show the code of the PHP call to EasyDump
+        'showSource'    => true,    //true to show the code of each PHP call to EasyDump
         'color'         => array(   //default theme based on Earthsong by daylerees
             'text'          => '#EBD1B7',
             'border'        => '#7A7267',
@@ -31,12 +32,14 @@ class EasyDump {
      */
     public static function debug() {
         $trace = debug_backtrace();
-        $call = self::readCall($trace);
+        if(self::$config['showCall'] || self::$config['showVarNames'] || self::$config['showSource'])
+            $call = self::readCall($trace);
 
         echo '<pre class="easydump" style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;">';
-        
+
         //show file and line
-        self::showCall($call);
+        if(self::$config['showCall'])
+            self::showCall($call);
 
         //show file and line
         if(self::$config['showTime'])
@@ -70,7 +73,7 @@ class EasyDump {
     /**
      * For debug purpose only, used by debug()
      * Recursive (for arrays) function to display variable in a nice formated way
-     * 
+     *
      * @param  string  $name           name/value of the variable's index
      * @param  misc    $value          value to display
      * @param  integer $level          for indentation purpose, used in recursion
@@ -138,13 +141,13 @@ class EasyDump {
 
     /**
      * Get the variable names used in the function call
-     * 
+     *
      * @param  array  $trace trace of nested calls
      * @return array         list of variable names (if available)
      */
     protected static function guessVarName($trace, $call) {
         $varNames = array();
-        
+
         $results = self::parse($call['code']);
 
         foreach($results as $k => $v) {
@@ -236,7 +239,7 @@ class EasyDump {
     /**
      * Read informations from the backtrace and the PHP file about the call to EasyDump
      * This function uses SplFileObject, only available on PHP 5.1.0+
-     * 
+     *
      * @param  array $trace backtrace executed PHP code
      * @return array        informations about the call
      */
@@ -259,7 +262,7 @@ class EasyDump {
         } else {
             $rank = 0;
         }
-        
+
         $line = --$trace[$rank]['line'];
         $file = new SplFileObject( $trace[$rank]['file'] );
         $file->seek( $line );
