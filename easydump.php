@@ -350,5 +350,3 @@ if ( !function_exists( 'de' ) ) {
         call_user_func_array( array( 'EasyDump', 'debugExit' ), func_get_args() );
     }
 }
-
-?>
