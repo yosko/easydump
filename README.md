@@ -1,7 +1,7 @@
 EasyDump
 =====
 
-EasyDump is an easy, sexy and lightweight way to display your PHP variable when developing. It is a nice alternative to ```var_dump```. It was partly inspired by (but not based on) [Kint](http://www.webresourcesdepot.com/kint-a-debugging-helper-for-php-apps/), but is way more simple.
+EasyDump is a lightweight, nice and easy way to display your PHP variables when developing. It is a nice alternative to ```var_dump```. It was partly inspired by (but not based on) [Kint](http://www.webresourcesdepot.com/kint-a-debugging-helper-for-php-apps/), but is way more simple.
 
 ## Requirement
 
