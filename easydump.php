@@ -11,53 +11,61 @@
  */
 class EasyDump
 {
-    //display configurattion
-    public static $config = array(
-        'showCall'      => true,    //true to show file name and line number of each call to EasyDump
-        'showTime'      => true,    //true to show the execution date, time and microsecond of each call
-        'showVarNames'  => true,    //true to show names of the given variables
-        'showSource'    => false,   //true to show the code of each PHP call to EasyDump
-        'color'         => array(   //default theme based on Earthsong by daylerees
-            'text'          => '#EBD1B7',
-            'border'        => '#7A7267',
-            'background'    => '#36312c',
-            'name'          => '#F8BB39',
-            'type'          => '#DB784D',
-            'value'         => '#95CC5E'
+    //display configuration
+    public static array $config = array(
+        'showCall' => true,    //true to show file name and line number of each call to EasyDump
+        'showTime' => true,    //true to show the execution date, time and microsecond of each call
+        'showVarNames' => true,    //true to show names of the given variables
+        'showSource' => false,   //true to show the code of each PHP call to EasyDump
+        'color' => array(   //default theme based on Earthsong by daylerees
+            'text' => '#EBD1B7',
+            'border' => '#7A7267',
+            'background' => '#36312c',
+            'name' => '#F8BB39',
+            'type' => '#DB784D',
+            'value' => '#95CC5E'
         )
     );
 
     /**
      * For debug purpose only
-     * @param  misc    $variables any number of variables of any type
+     * @param mixed $variables any number of variables of any type
+     * @throws Exception
      */
     public static function debug()
     {
+        $call = null;
         $trace = debug_backtrace();
-        if (self::$config['showCall'] || self::$config['showVarNames'] || self::$config['showSource'])
+        if (self::$config['showCall'] || self::$config['showVarNames'] || self::$config['showSource']) {
             $call = self::readCall($trace);
+        }
 
-        echo '<pre class="easydump" style="border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;text-align:left;min-width:300px;">';
+        echo '<pre class="easydump" style="display: block !important; border: 0.5em solid '.self::$config['color']['border'].'; color: '.self::$config['color']['text'].'; background-color: '.self::$config['color']['background'].'; margin: 0; padding: 0.5em; white-space: pre-wrap;font-family:\'DejaVu Sans Mono\',monospace;font-size:11px;text-align:left;min-width:300px;">';
 
         //show file and line
-        if (self::$config['showCall'])
+        if (self::$config['showCall']) {
             self::showCall($call);
+        }
 
         //show file and line
-        if (self::$config['showTime'])
-            echo self::microDateTime()."\r\n";
+        if (self::$config['showTime']) {
+            echo self::microDateTime() . "\r\n";
+        }
 
         //show PHP source of the call
-        if (self::$config['showSource'])
+        if (self::$config['showSource']) {
             self::showSource($call);
+        }
 
         //get the variable names (if available)
-        if (self::$config['showVarNames'])
-            $varNames = self::guessVarName($trace, $call);
+        $varNames = [];
+        if (self::$config['showVarNames']) {
+            $varNames = self::guessVarName($call);
+        }
 
         //show the values (with variable names if available)
         foreach ( $trace[0]['args'] as $k => $v ) {
-            EasyDump::showVar((self::$config['showVarNames']?$varNames[$k]:$k), $v);
+            self::showVar((self::$config['showVarNames']?$varNames[$k]:$k), $v);
         }
 
         echo '</pre>';
@@ -65,7 +73,7 @@ class EasyDump
 
     /**
      * For debug purpose only. Exits after dump
-     * @param  misc    $variable the variable to dump
+     * @param  mixed    $variable the variable to dump
      */
     public static function debugExit()
     {
@@ -75,21 +83,22 @@ class EasyDump
 
     /**
      * For debug purpose only, used by debug()
-     * Recursive (for arrays) function to display variable in a nice formated way
+     * Recursive (for arrays) function to display variable in a nice formatted way
      *
-     * @param  string  $name           name/value of the variable's index
-     * @param  misc    $value          value to display
-     * @param  integer $level          for indentation purpose, used in recursion
-     * @param  boolean $serializeArray force array serialization
+     * @param string $name name/value of the variable's index
+     * @param mixed $value value to display
+     * @param int $level for indentation purpose, used in recursion
+     * @param bool $dumpArray
+     * @throws Exception
      */
-    protected static function showVar($name, $value, $level = 0, $dumpArray = false)
+    protected static function showVar(string $name, $value, $level = 0, $dumpArray = false)
     {
         $indent = "    ";
         for ($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
-        echo '<span style="color:'.self::$config['color']['name'].';">'.($level == 0?$name:(is_string($name)?'"'.$name.'"':'['.$name.']'))." </span>";
+        echo '<span style="color:'.self::$config['color']['name'].';">'.($level === 0?$name:(is_string($name)?'"'.$name.'"':'['.$name.']'))." </span>";
         echo '<span style="color:'.self::$config['color']['type'].';">('.(is_object($value)?get_class($value):gettype($value)).")</span>\t= ";
-        if (self::isTraversable($value) && !$dumpArray && $level <= 5) {
-            echo '{';
+        if (!$dumpArray && $level <= 5 && self::isTraversable($value)) {
+            echo is_array($value) ? '[' : '{';
             $count = 0;
             foreach ($value as $k => $v) {
                 $count++;
@@ -101,7 +110,8 @@ class EasyDump
                 }
                 for ($lvl = 0; $lvl < $level; $lvl++) { echo $indent; }
             }
-            echo "}\r\n";
+            echo is_array($value) ? ']' : '}';
+            echo "\r\n";
         } else {
             echo '<span style="color:'.self::$config['color']['value'].';">';
             if (is_object($value) || is_resource($value)) {
@@ -129,9 +139,9 @@ class EasyDump
 
     /**
      * Display the filename and line number where EasyDump was called
-     * @param  array $call informations about the call
+     * @param array $call information about the call
      */
-    protected static function showCall($call)
+    protected static function showCall(array $call)
     {
         echo "<span style=\"color:".self::$config['color']['type'].";\">File \"".$call['file']."\" line ".$call['line'].":</span>\r\n";
     }
@@ -139,11 +149,11 @@ class EasyDump
     /**
      * Display the PHP code where EasyDump was called
      * useful for tracking lots of different calls with values/functions as parameters
-     * @param  array $call informations about the call
+     * @param array $call information about the call
      */
-    protected static function showSource($call)
+    protected static function showSource(array $call)
     {
-        echo $call['formatedCode']
+        echo $call['formattedCode']
         ."\r\n"
         ."<span style=\"color:".self::$config['color']['type'].";\">Results:</span>"
         ."\r\n";
@@ -152,10 +162,10 @@ class EasyDump
     /**
      * Get the variable names used in the function call
      *
-     * @param  array  $trace trace of nested calls
+     * @param array $call
      * @return array         list of variable names (if available)
      */
-    protected static function guessVarName($trace, $call)
+    protected static function guessVarName(array $call): array
     {
         $varNames = array();
 
@@ -166,9 +176,9 @@ class EasyDump
             if (preg_match('/^\$/', $processString)) {
                 $varNames[] = $processString;
             } elseif (is_numeric($processString)
-                    || substr($processString, 0, 1) == "'"
-                    || substr($processString, 0, 1) == '"'
-                    || substr($processString, 0, 5) == 'array'
+                    || $processString[0] === "'"
+                    || $processString[0] === '"'
+                    || strpos($processString, 'array') === 0
             ) {
                 //TODO: not working for empty string
                 $varNames[] = '[value]';
@@ -184,10 +194,10 @@ class EasyDump
 
     /**
      * Pars PHP code to extract comma separated elements into an array
-     * @param  string $code PHP code
+     * @param string $code PHP code
      * @return array        list of elements
      */
-    protected static function parse($code)
+    protected static function parse(string $code): array
     {
         $names = array();
         $currentName = '';
@@ -201,26 +211,27 @@ class EasyDump
         );
         $inQuotes = '';
         $inDelimiter = '';
-        for ($i = 0; $i < strlen($code); $i++) {
+        $len = strlen($code);
+        for ($i = 0; $i < $len; $i++) {
             $stackChar = true;
             if (!$escapeNext) {
                 //escape char inside a string between single/double quotes
-                if (!empty($inQuotes) && $code[$i] == '\\') {
+                if (!empty($inQuotes) && $code[$i] === '\\') {
                     $escapeNext = true;
                 //leaving a quoted string
-                } elseif (!empty($inQuotes) && $code[$i] == $inQuotes) {
+                } elseif (!empty($inQuotes) && $code[$i] === $inQuotes) {
                     $inQuotes = '';
                 //entering a quoted string
-                } elseif (empty($inQuotes) && ($code[$i] == '\'' || $code[$i] == '"')) {
+                } elseif (empty($inQuotes) && ($code[$i] === '\'' || $code[$i] === '"')) {
                     $inQuotes = $code[$i];
                 //recursive use of delimiter, add a level
-                } elseif (!empty($inDelimiter) && $code[$i] == $inDelimiter) {
+                } elseif (!empty($inDelimiter) && $code[$i] === $inDelimiter) {
                     $depth++;
                 //recursive use of delimiter, remove a level
-                } elseif (!empty($inDelimiter) && $code[$i] == $delimiter[$inDelimiter]) {
+                } elseif (!empty($inDelimiter) && $code[$i] === $delimiter[$inDelimiter]) {
                     $depth--;
                     //leaving the parent delimiter
-                    if ($depth == 0) {
+                    if ($depth === 0) {
                         $inDelimiter = '';
                     }
                 //entering a parent delimiter
@@ -228,7 +239,7 @@ class EasyDump
                     $inDelimiter = $code[$i];
                     $depth++;
                 //a root, breaking comma
-                } elseif (empty($inDelimiter) && empty($inQuotes) && $code[$i] == ',') {
+                } elseif (empty($inDelimiter) && empty($inQuotes) && $code[$i] === ',') {
                     $names[] = $currentName;
                     $currentName = '';
                     $stackChar = false;
@@ -249,40 +260,41 @@ class EasyDump
     }
 
     /**
-     * Read informations from the backtrace and the PHP file about the call to EasyDump
+     * Read information from the backtrace and the PHP file about the call to EasyDump
      * This function uses SplFileObject, only available on PHP 5.1.0+
      *
-     * @param  array $trace backtrace executed PHP code
-     * @return array        informations about the call
+     * @param array $trace backtrace executed PHP code
+     * @return array        information about the call
      */
-    protected static function readCall($trace)
+    protected static function readCall(array $trace): array
     {
-        //called de()
-        if (count($trace) >= 5
-                && $trace[2]['function'] == 'debugExit'
-                && $trace[4]['function'] == 'de'
-        ) {
-            $rank = 4;
+        //echo '<pre>'; var_dump(count($trace), $trace);
 
-        //called EasyDump::debugExit() or d()
-        } elseif (count($trace) >= 3
-                && ($trace[2]['function'] == 'debugExit'
-                || $trace[2]['function'] == 'd')
+        //called de()
+        if (count($trace) >= 3
+                && $trace[1]['function'] === 'debugExit'
+                && $trace[2]['function'] === 'de'
         ) {
             $rank = 2;
+
+        //called EasyDump::debugExit() or d()
+        } elseif (count($trace) >= 2
+                && ($trace[1]['function'] === 'debugExit'
+                || $trace[1]['function'] === 'd')
+        ) {
+            $rank = 1;
 
         //called EasyDump::debug()
         } else {
             $rank = 0;
         }
-
         $line = --$trace[$rank]['line'];
         $file = new SplFileObject( $trace[$rank]['file'] );
         $file->seek( $line );
         $call = trim( $file->current() );
         $callMultiline = $file->current();
 
-        //read the PHP file backward to the begining of the call
+        //read the PHP file backward to the beginning of the call
         $regex = '/'.$trace[$rank]['function'].'\((.*)\);/';
         while (!preg_match($regex, $call, $match)) {
             $file->seek( --$line );
@@ -295,7 +307,7 @@ class EasyDump
 
         return array(
             'code' => $call,
-            'formatedCode' => $callMultiline,
+            'formattedCode' => $callMultiline,
             'rank' => $rank,
             'line' => $line + 1,
             'file' => $trace[$rank]['file']
@@ -305,19 +317,22 @@ class EasyDump
     /**
      * Check if given variable is traversable in any way (array, traversable object even if it doesn't
      * implements Traversable)
-     * @param  misc    $variable backtrace executed PHP code
-     * @return boolean           informations about the call
+     * @param mixed $variable backtrace executed PHP code
+     * @return bool           information about the call
+     * @throws Exception
      */
-    protected static function isTraversable($variable)
+    protected static function isTraversable($variable): bool
     {
         //most common cases
         if (is_array($variable) || $variable instanceof StdClass || $variable instanceof Traversable) {
             return true;
-        } elseif (!is_object($variable)) {
+        }
+
+        if (!is_object($variable)) {
             return false;
         }
 
-        set_error_handler(function ($errno, $errstr, $errfile, $errline, array $errcontext) {
+        set_error_handler(function ($errno, $errstr) {
             throw new Exception($errstr, $errno);
         });
 
@@ -335,10 +350,10 @@ class EasyDump
         return true;
     }
 
-    protected static function microDateTime()
+    protected static function microDateTime(): string
     {
       list($microSec, $timeStamp) = explode(' ', microtime());
-      return date('Y-m-d H:i:s.', $timeStamp) . (int)($microSec * 1000000);
+      return date('Y-m-d H:i:s.', $timeStamp) . ($microSec * 1000000);
     }
 }
 

@@ -1,3 +1,4 @@
 {
-    "name": "yosko/easydump"
+    "name": "yosko/easydump",
+    "description": "lightweight, nice and easy way to display PHP variables"
 }
