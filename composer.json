@@ -1,4 +1,12 @@
 {
     "name": "yosko/easydump",
-    "description": "lightweight, nice and easy way to display PHP variables"
+    "description": "lightweight, nice and easy way to display PHP variables",
+    "type": "library",
+    "require": {
+        "php": ">=7.4"
+    },
+    "license": "WTFPL",
+    "autoload": {
+        "files": ["easydump.php"]
+    }
 }
