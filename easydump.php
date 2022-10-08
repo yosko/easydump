@@ -31,6 +31,8 @@ class EasyDump
         )
     );
 
+    private static array $objectsDisplayed;
+
     /**
      * For debug purpose only
      * @param mixed $variables any number of variables of any type
@@ -39,6 +41,7 @@ class EasyDump
     public static function debug()
     {
         $call = null;
+        self::$objectsDisplayed = [];
         $trace = debug_backtrace();
         if (self::$config['showCall'] || self::$config['showVarNames'] || self::$config['showSource']) {
             $call = self::readCall($trace);
@@ -297,6 +300,14 @@ class EasyDump
                     $count++;
                 }
             } else { // object
+                // detect infinite recursivity: only display a same object once
+                if (in_array($value, self::$objectsDisplayed, true)) {
+                    $key = array_search($value, self::$objectsDisplayed,true);
+                    echo "{recursive display: object #$key}\n";
+                    return;
+                }
+                self::$objectsDisplayed[] = $value;
+                
                 echo '{';
 
                 $ref = new ReflectionObject($value);
