@@ -21,6 +21,7 @@ class EasyDump
         'showTime' => true,    //true to show the execution date, time and microsecond of each call
         'showVarNames' => true,    //true to show names of the given variables
         'showSource' => false,   //true to show the code of each PHP call to EasyDump
+        'showMaxDepth' => 5,    //maximum depth of the variable to display
         'color' => array(   //default theme based on Earthsong by daylerees
             'text' => '#EBD1B7',
             'border' => '#7A7267',
@@ -291,7 +292,7 @@ class EasyDump
         }
         echo(is_object($value) ? get_class($value) : ($declaredType ?: gettype($value)));
         echo ")</span>\t= ";
-        if (!$dumpArray && $level <= 5 && self::isTraversable($value)) {
+        if (!$dumpArray && $level <= self::$config['showMaxDepth'] && self::isTraversable($value)) {
             $count = 0;
             if (is_array($value)) {
                 echo '[';
@@ -357,7 +358,6 @@ class EasyDump
             echo '<span style="color:' . self::$config['color']['value'] . ';">';
             if (is_object($value) || is_resource($value)) {
                 ob_start();
-                var_dump($value);
                 $result = ob_get_clean();
                 //trim the var_dump because EasyDump already handle the newline after dump
                 echo trim($result);
