@@ -265,13 +265,13 @@ class EasyDump
      * For debug purpose only, used by debug()
      * Recursive (for arrays) function to display variable in a nice formatted way
      *
-     * @param string $name name/value of the variable's index
+     * @param string|int $name name/value of the variable's index
      * @param mixed $value value to display
      * @param int $level for indentation purpose, used in recursion
      * @param int $modifier IS_PUBLIC, IS_PRIVATE, IS_PROTECTED, IS_STATIC
      * @throws Exception
      */
-    protected static function showVar(string $name, $value, $level = 0, $modifier = self::IS_PUBLIC, $declaredType = '')
+    protected static function showVar($name, $value, $level = 0, $modifier = self::IS_PUBLIC, $declaredType = '')
     {
         // deprecated: used to be an (unused) argument
         $dumpArray = false;
@@ -307,7 +307,7 @@ class EasyDump
                     return;
                 }
                 self::$objectsDisplayed[] = $value;
-                
+
                 echo '{';
 
                 $ref = new ReflectionObject($value);
